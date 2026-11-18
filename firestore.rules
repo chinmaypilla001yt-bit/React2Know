@@ -1,0 +1,21 @@
+rules_version = '2';
+
+// React2Know profile rules.
+//
+// The only Firestore data this app stores is an optional avatar image, kept in
+// one document per user keyed by the Firebase Auth UID. A signed-in user can
+// read and write their own document and nothing else, so no account can ever
+// read or modify another user's profile. Passwords are never stored here —
+// password changes go through Firebase Authentication's hosted reset flow.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Deny everything that is not an owned profile document.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
